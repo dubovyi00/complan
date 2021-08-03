@@ -36,7 +36,7 @@ def rpn(problem):
 	brackets_error = False
 	i = 0
 	while i < len(problem) and not brackets_error:
-		#print(problem[i]) 
+		print(problem[i])
 		if problem[i].isdigit():
 			num = ""
 			will = True
@@ -45,18 +45,28 @@ def rpn(problem):
 				if (problem[i].isdigit() or problem[i] == '.' or problem[i] == 'i'):
 					#print(problem[i])
 					num += problem[i]
+				elif problem[i] == ')':
+				#	if len(stack) != 0:
+				#		while stack[len(stack)-1] != '(':
+				#			rez += stack[len(stack)-1]  + " "
+				#			stack.pop()
+				#			if len(stack) == 0:
+				#				break
+						
+				#		if len(stack) == 0:
+				#			brackets_error = True	
+				#		elif stack[len(stack)-1] == '(':
+				#			stack.pop()
+					will = False		
+					i -= 1
 				else:
 					will = False	
-				i += 1	
+				i += 1
 			rez += num + " "
 
-			#print("i = "+str(i))
 			if (i < len(problem)):
 				i -= 2
-			#print("str = "+rez)
-			#print("stack = "+str(stack))
-			#print("------------")
-		
+
 		elif problem[i] == "e":
 			if i < len(problem)-1:
 				if problem[i+1] == "i":
@@ -77,18 +87,20 @@ def rpn(problem):
 				stack.append(problem[i:i+2:])
 			
 		
-		elif problem[i:i+2:] == "re" or problem[i:i+2:] == "im" or problem[i:i+3:] == "tg" or problem[i:i+3:] == "sh" or problem[i:i+3:] == "ch" or problem[i:i+3:] == "th":
+		elif problem[i:i+2:] == "re" or problem[i:i+2:] == "im" or problem[i:i+2:] == "tg" or problem[i:i+2:] == "sh" or problem[i:i+2:] == "ch" or problem[i:i+2:] == "th":
 			if problem[i+2] != '(':
 				brackets_error = True
 			else:
 				stack.append(problem[i:i+2:])
 				i += 1
+				
 		elif problem[i:i+3:] == "arg" or problem[i:i+3:] == "abs" or problem[i:i+3:] == "exp" or problem[i:i+3:] == "sin" or problem[i:i+3:] == "cos" or problem[i:i+3:] == "ctg" or problem[i:i+3:] == "cth":
 			if problem[i+3] != '(':
 				brackets_error = True
 			else:
 				stack.append(problem[i:i+3:])
 				i += 2
+				
 		elif problem[i:i+4:] == "conj" or problem[i:i+4:] == "arsh" or problem[i:i+4:] == "arch" or problem[i:i+4:] == "arth":
 			if problem[i+4] != '(':
 				brackets_error = True
@@ -114,14 +126,17 @@ def rpn(problem):
 			stack.append('(')
 		
 		elif problem[i] == ')':
-			
-			while stack[len(stack)-1] != '(' and len(stack) != 0:
-				rez += stack[len(stack)-1]  + " "
-				stack.pop()
-			if stack[len(stack)-1] == '(':
-				stack.pop()
-			elif len(stack) == 0:
-				brackets_error = True	
+			if len(stack) != 0:
+				while stack[len(stack)-1] != '(':
+					rez += stack[len(stack)-1]  + " "
+					stack.pop()
+					if len(stack) == 0:
+						break
+				
+				if len(stack) == 0:
+					brackets_error = True	
+				elif stack[len(stack)-1] == '(':
+					stack.pop()
 		
 		elif problem[i] == '+' or problem[i] == '-':
 			while len(stack) != 0:
@@ -132,7 +147,7 @@ def rpn(problem):
 					break
 			stack.append(problem[i])
 
-		elif problem[i] == '*' and problem[i+1] != '*' or problem[i] == '/':	
+		elif problem[i] == '*' and problem[i+1] != '*':	
 			while len(stack) != 0:
 				if stack[len(stack)-1] != '(' and stack[len(stack)-1] != ')' and stack[len(stack)-1] != '+' and stack[len(stack)-1] != '-':
 					rez += stack[len(stack)-1]  + " "
@@ -140,6 +155,15 @@ def rpn(problem):
 				else:
 					break
 			stack.append(problem[i])
+			
+		elif problem[i] == ':':
+			while len(stack) != 0:
+				if stack[len(stack)-1] != '(' and stack[len(stack)-1] != ')' and stack[len(stack)-1] != '+' and stack[len(stack)-1] != '-':
+					rez += stack[len(stack)-1]  + " "
+					stack.pop()
+				else:
+					break
+			stack.append("/")
 
 		elif problem[i] == '^':
 			stack.append(problem[i])
@@ -147,6 +171,7 @@ def rpn(problem):
 		print("rez = "+rez)
 		print("stack = "+str(stack))	
 		i += 1
+
 	
 	if not brackets_error and stack.count('(') == 0 and stack.count(')') == 0:
 		i = len(stack) - 1

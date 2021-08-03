@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack --mode development ./src/link.js -o ./static/interface/main.js",
-    "build": "webpack --mode production ./src/link.js -o ./static/interface/main.js"
+    "dev": "webpack --mode development ./src/link.js -o ./static/interface",
+    "build": "webpack --mode production ./src/link.js -o ./static/interface"
   },
   "keywords": [],
   "author": "",
