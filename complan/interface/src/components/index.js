@@ -29,8 +29,10 @@ class SimpleActions extends React.Component {
     this.state = {
       data: [],
       expression: "",
-      status: 1,
+      status: 2,
       rez: "",
+      step_list: [],
+      step_list_view: (<div> Жопа</div>),
     };
     
   }
@@ -39,9 +41,24 @@ class SimpleActions extends React.Component {
       
   }
 
-
+  async getData(val) {
+  	const response = await fetch("/api/simple_action/"+encodeURI(val));
+  	console.log("Results loaded!");
+  	if (response.status >= 400) {
+  		return this.setState(() => {
+			return { status: 0 };
+		});
+  	} else {
+  		this.setState(() => {
+			return { status: 1 };
+		});
+  		return await response.json();
+  	}
+  	
+  }
 
   render() {
+  
     return (
        <div
        style={{
@@ -65,34 +82,89 @@ class SimpleActions extends React.Component {
                   	onChange={(e) => {
 
                   	                this.setState({expression: e.target.value.toString()});
-                  	                fetch("/api/simple_action/"+encodeURI(e.target.value.toString().replace('/',':')))
-					      .then(response => {
-						if (response.status >= 400) {
-						  return this.setState(() => {
-						    return { status: 0 };
-						  });
-						}
-						return response.json();
-					      })
+                  	                if (e.target.value.toString() != "") {
+                  	                	this.getData(e.target.value.toString())
 					      .then(data => {
-						this.setState(() => {
-						  return {
-						    rez: data,
-						    status: 1,
-						  }
-						})
+					      	if (this.state.status != 0) {
+					      		this.setState(() => {
+							  return {
+							    rez: data.response,
+							    step_list: data.steps,
+							    
+							    status: 1,
+							  }
+							});
+							if (data.response == "Error with brackets!") {
+								this.setState(() => {
+								  return {
+								    
+								    status: 3,
+								  }
+								});
+							}
+							console.log(data.steps);
+							if (data.steps != undefined && data.steps.length != 0) {
+								console.log(data.steps);
+								this.setState(() => {
+									return {
+										step_list_view: (
+										    	<div>
+				       		
+									       		<h3>Steps</h3>
+									       		
+									       		{
+									       			data.steps.map((val) => (
+									       			
+									       				<p>{val.n}. {val.formula}</p>
+									       			))
+									       		}
+									       	</div>
+										    ),
+									}
+									
+								})
+							}
+							console.log(this.state.step_list);
+					      	}
+						
 					      });
+                  	                } else {
+                  	                	this.setState(() => {
+							  return {
+							    rez: "",
+							    step_list: [],
+							    
+							    status: 2,
+							  }
+							});
+                  	                }
+                  	          	 
 					
                   	            }} 
        		>
        		
        	</input>
        	
-       	{this.state.rez != undefined && this.state.rez != "" &&
-       		<p>Result: {this.state.rez.response}</p>
+       	{
+	       	this.state.status === 1 &&
+	       	this.state.rez != undefined && this.state.rez != "" &&
+	       	<p>Result: {this.state.rez}</p>
        	}
-       	{this.state.status === 0 &&
-       	<p>Server error!</p>
+       	{
+	       	this.state.status === 0 &&
+	       	<p>Maybe, you haven't finished writing your expression?</p>
+       	}
+       	{
+       		this.state.status === 1 &&
+       		this.state.step_list != undefined &&
+	       	this.state.step_list[0] != undefined &&
+	       	this.state.step_list_view 
+
+       	}
+       	{
+       		this.state.status === 3 &&
+	       	<p>Brackets error!</p>
+
        	}
        	<br />
        	<br />

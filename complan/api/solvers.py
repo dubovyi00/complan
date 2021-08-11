@@ -1,4 +1,5 @@
 import cmath
+from .models import *
 
 def rpn(problem):
 	stack = []
@@ -24,7 +25,7 @@ def rpn(problem):
 		if i == 0 and (old_problem[i] == '+' or old_problem[i] == '-') and old_problem[i+1].isdigit():
 			problem = "0" +  old_problem[i:i+2:]
 			i += 2
-		elif old_problem[i] == '(' and (old_problem[i+1] == '+' or old_problem[i+1] == '-') and old_problem[i+2].isdigit():
+		elif i <= len(old_problem)-2 and old_problem[i] == '(' and (old_problem[i+1] == '+' or old_problem[i+1] == '-') and old_problem[i+2].isdigit():
 			problem += "(0" +  old_problem[i+1:i+3:]
 			i += 3
 		else:
@@ -184,11 +185,12 @@ def rpn(problem):
 
 	return rez
 
-def simple_action(problem):
+def simple_action(problem, idp):
 	parsed = problem.split(" ")
 	stack = []
 	rez = 0
 	parsed.pop()
+	n = 1
 	print(parsed)
 	for elem in parsed:
 		if elem.isdigit():
@@ -211,71 +213,126 @@ def simple_action(problem):
 				
 		else:
 			if elem == "+":
-				stack[len(stack)-2] = stack[len(stack)-2] + stack[len(stack)-1]
+				act_rez = stack[len(stack)-2] + stack[len(stack)-1]
+				SolutionStep.objects.create(problem_id=idp, n=n, formula=str(stack[len(stack)-2]) + " + " + str(stack[len(stack)-1]) + " = " + str(act_rez))
+				stack[len(stack)-2] = act_rez
 				stack.pop()
 			elif elem == "-":
-				stack[len(stack)-2] = stack[len(stack)-2] - stack[len(stack)-1]
+				act_rez = stack[len(stack)-2] - stack[len(stack)-1]
+				SolutionStep.objects.create(problem_id=idp, n=n, formula=str(stack[len(stack)-2]) + " - " + str(stack[len(stack)-1]) + " = " + str(act_rez))
+				stack[len(stack)-2] = act_rez
 				stack.pop()
 			elif elem == "*":
-				stack[len(stack)-2] = stack[len(stack)-2] * stack[len(stack)-1]
+				act_rez = stack[len(stack)-2] * stack[len(stack)-1]
+				SolutionStep.objects.create(problem_id=idp, n=n, formula=str(stack[len(stack)-2]) + " * " + str(stack[len(stack)-1]) + " = " + str(act_rez))
+				stack[len(stack)-2] = act_rez
 				stack.pop()
 			elif elem == "/":
-				stack[len(stack)-2] = stack[len(stack)-2] / stack[len(stack)-1]
+				act_rez = stack[len(stack)-2] / stack[len(stack)-1]
+				SolutionStep.objects.create(problem_id=idp, n=n, formula=str(stack[len(stack)-2]) + " / " + str(stack[len(stack)-1]) + " = " + str(act_rez))
+				stack[len(stack)-2] = act_rez
 				stack.pop()
 			elif elem == "^":
-				stack[len(stack)-2] = stack[len(stack)-2] ** stack[len(stack)-1]
+				act_rez = stack[len(stack)-2] ** stack[len(stack)-1]
+				SolutionStep.objects.create(problem_id=idp, n=n, formula=str(stack[len(stack)-2]) + " ^ " + str(stack[len(stack)-1]) + " = " + str(act_rez))
+				stack[len(stack)-2] = act_rez
 				stack.pop()
 				
 			elif elem == "re":
-				stack[len(stack)-1] = complex(stack[len(stack)-1].real)
+				act_rez = complex(stack[len(stack)-1].real)
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="re(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "im":
-				stack[len(stack)-1] = complex(stack[len(stack)-1].imag)
+				act_rez = complex(stack[len(stack)-1].imag)
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="im(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "conj":
-				stack[len(stack)-1] = complex(stack[len(stack)-1].conjugate())
+				act_rez = complex(stack[len(stack)-1].conjugate())
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="conj(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			
 			elif elem == "arg":
-				stack[len(stack)-1] = cmath.phase(stack[len(stack)-1])
+				act_rez = cmath.phase(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arg(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "abs":
-				stack[len(stack)-1] = abs(stack[len(stack)-1])
+				act_rez = abs(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="abs(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 				
 			elif elem == "exp":
-				stack[len(stack)-1] = cmath.exp(stack[len(stack)-1])
+				act_rez = cmath.exp(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="exp(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "ln":
-				stack[len(stack)-1] = cmath.log(stack[len(stack)-1])
+				act_rez = cmath.log(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="ln(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			
 			elif elem == "sin":
-				stack[len(stack)-1] = cmath.sin(stack[len(stack)-1])
+				act_rez = cmath.sin(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="sin(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "cos":
-				stack[len(stack)-1] = cmath.cos(stack[len(stack)-1])	
+				act_rez = cmath.cos(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="cos(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))	
+				stack[len(stack)-1] = act_rez
 			elif elem == "tg":
-				stack[len(stack)-1] = cmath.tan(stack[len(stack)-1])
+				act_rez = cmath.tan(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="tg(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "ctg":
-				stack[len(stack)-1] = cmath.cos(stack[len(stack)-1]) / cmath.sin(stack[len(stack)-1]) # не ну а чо раз котангенса нема
+				act_rez = cmath.cos(stack[len(stack)-1]) / cmath.sin(stack[len(stack)-1]) # не ну а чо раз котангенса нема
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="ctg(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			
 			elif elem == "arcsin":
-				stack[len(stack)-1] = cmath.asin(stack[len(stack)-1])
+				act_rez = cmath.asin(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arcsin(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "arccos":
-				stack[len(stack)-1] = cmath.acos(stack[len(stack)-1])	
+				act_rez = cmath.acos(stack[len(stack)-1])	
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arccos(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "arctg":
-				stack[len(stack)-1] = cmath.atan(stack[len(stack)-1])
+				act_rez = cmath.atan(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arctg(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "arсctg":
-				stack[len(stack)-1] = cmath.pi / 2 - cmath.atan(stack[len(stack)-1]) # опять, да
+				act_rez = cmath.pi / 2 - cmath.atan(stack[len(stack)-1]) # опять, да
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arсctg(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 				
 			elif elem == "sh":
-				stack[len(stack)-1] = cmath.sinh(stack[len(stack)-1])
+				act_rez = cmath.sinh(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="sh(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "ch":
-				stack[len(stack)-1] = cmath.cosh(stack[len(stack)-1])	
+				act_rez = cmath.cosh(stack[len(stack)-1])	
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="ch(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "th":
-				stack[len(stack)-1] = cmath.tanh(stack[len(stack)-1])
+				act_rez = cmath.tanh(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="th(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "cth":
-				stack[len(stack)-1] = cmath.cosh(stack[len(stack)-1]) / cmath.sinh(stack[len(stack)-1]) # не ну а чо раз котангенса нема
+				act_rez = cmath.cosh(stack[len(stack)-1]) / cmath.sinh(stack[len(stack)-1]) # не ну а чо раз котангенса нема
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="cth(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 				
 			elif elem == "arsh":
-				stack[len(stack)-1] = cmath.asinh(stack[len(stack)-1])
+				act_rez = cmath.asinh(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arsh(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "arch":
-				stack[len(stack)-1] = cmath.acosh(stack[len(stack)-1])	
+				act_rez = cmath.acosh(stack[len(stack)-1])	
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arch(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
 			elif elem == "arth":
-				stack[len(stack)-1] = cmath.atanh(stack[len(stack)-1])
+				act_rez = cmath.atanh(stack[len(stack)-1])
+				SolutionStep.objects.create(problem_id=idp, n=n, formula="arth(" + str(stack[len(stack)-1]) + ") = " + str(act_rez))
+				stack[len(stack)-1] = act_rez
+			n += 1
 		print(stack)
 	
 	return str(stack[0])

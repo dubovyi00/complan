@@ -19,14 +19,15 @@ class SimpleActionSerializer(serializers.ModelSerializer):
 class SolutionStepSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = SolutionStep
-		fields = ('desription', 'formula_url')
+		fields = ('problem_id', 'n', 'formula')
 
 	def create(self, validated_data):
 		return SimpleAction.objects.create(**validated_data)		
 	
 	def update(self, instance, validated_data):
-		instance.desription = validated_data.get('desription', instance.desription)
-		instance.formula_url = validated_data.get('formula_url', instance.formula_url)
+		instance.problem_id = validated_data.get('problem_id', instance.problem_id)
+		instance.n = validated_data.get('n', instance.n)
+		instance.formula = validated_data.get('formula', instance.formula)
 
 		instance.save()
 		return instance

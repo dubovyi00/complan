@@ -6,5 +6,6 @@ class SimpleAction(models.Model):  # Модель для простых дейс
 	result=models.TextField()  # Результат
 
 class SolutionStep(models.Model):  # Описание решения по шагам
-	desription=models.TextField()  # Описание шага
-	formula_url=models.TextField()  # Изображение с формулой
+	problem_id=models.TextField(max_length=15)  # Идентификатор задачи (чтобы как-то различать их)
+	n=models.IntegerField()  # Описание шага
+	formula=models.TextField()  # Изображение с формулой
