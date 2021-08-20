@@ -1,5 +1,13 @@
 import cmath
 from .models import *
+import re
+ 
+def isfloat(s):
+    find = re.findall(r"\d*\.\d+", s)  
+    if find:
+        return True
+    else:
+        return False
 
 def rpn(problem):
 	stack = []
@@ -32,17 +40,18 @@ def rpn(problem):
 			problem += old_problem[i]			
 			i += 1
 		
-	
+	problem += " "
 	# начинаем перевод в обратную польскую запись
 	brackets_error = False
 	i = 0
 	while i < len(problem) and not brackets_error:
-		print(problem[i])
+		print()
+		print("symbol = "+problem[i])
 		if problem[i].isdigit():
 			num = ""
 			will = True
 			while i < len(problem) and will:
-				
+				print(problem[i])
 				if (problem[i].isdigit() or problem[i] == '.' or problem[i] == 'i'):
 					#print(problem[i])
 					num += problem[i]
@@ -59,9 +68,10 @@ def rpn(problem):
 				#		elif stack[len(stack)-1] == '(':
 				#			stack.pop()
 					will = False		
-					i -= 1
+				#	i -= 1
 				else:
 					will = False	
+					
 				i += 1
 			rez += num + " "
 
@@ -193,10 +203,11 @@ def simple_action(problem, idp):
 	n = 1
 	print(parsed)
 	for elem in parsed:
-		if elem.isdigit():
+		if elem.isdigit() or (isfloat(elem) and elem.find('i') == -1):
 			stack.append(complex(elem))
 		
-		elif elem[0:len(elem)-1:].isdigit() and elem[len(elem)-1] == 'i':
+		elif (elem[0:len(elem)-1:].isdigit() or isfloat(elem[0:len(elem)-1:])) and elem[len(elem)-1] == 'i':
+			print(elem)
 			stack.append(complex(elem.replace('i', 'j')))
 			
 		elif elem[0:2:] == "pi":

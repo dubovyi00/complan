@@ -115,7 +115,7 @@ class SimpleActions extends React.Component {
 									       		{
 									       			data.steps.map((val) => (
 									       			
-									       				<p>{val.n}. {val.formula}</p>
+									       				<p><b><ins>{val.n}.</ins></b> {val.formula}</p>
 									       			))
 									       		}
 									       	</div>
